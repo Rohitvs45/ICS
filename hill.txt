@@ -1,0 +1,55 @@
+import math
+import numpy as np
+
+def generate_key_matrix(key):
+  row = math.ceil(len(key)/3)
+  key_mat = np.zeros((row,3))
+  # print(key_mat)
+  k=0
+  for i in range(3):
+    for j in range(row):
+      if k>=len(key):
+        break
+      key_mat[j][i] = ord(key[k]) - ord('a')
+      k+=1
+  return key_mat
+
+def encrypt(key, msg):
+  msg = msg.replace(" ","")
+  msg = msg.lower()
+  key_matrix = generate_key_matrix(key)
+  print(key_matrix)
+  cypher_text = ""
+  for i in range(0,len(msg),3):
+    lis = []
+    if i+3 >= len(msg):
+      temp = msg[i:]
+      for i in temp:
+        lis.append(ord(i) - ord('a'))
+      lis.extend([0]*(3-len(lis)))
+    else:
+      temp = msg[i:i+3]
+      for i in temp:
+        lis.append(ord(i) - ord('a'))
+    lis = np.array(lis).reshape((3,1))
+    # print(lis)
+    mul = np.matmul(key_matrix,lis)
+    # print(mul)
+    for i in range(len(mul)):
+      for j in range(len(mul[0])):
+        cypher_text += chr(int(ord('a') + mul[i][j]%26 ))
+  return cypher_text
+
+
+
+key = "gnuyqrbkp"
+message = "Save the king as he will be attacked tonight"
+
+print("Key: ", key)
+print("Message: ", message)
+
+enc_msg = encrypt(key, message)
+print("\nEncrypted Message: ", enc_msg)
+
+# dec_msg = decrypt(key, enc_msg)
+# print("\nDecrypted Message: ", dec_msg)
